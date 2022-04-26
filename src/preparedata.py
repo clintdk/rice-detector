@@ -37,9 +37,3 @@ class preparedata:
     def __normalizedata(self):
         self.train_ds = self.train_ds / 255.0
         self.val_ds = self.val_ds / 255.0
-
-    def __resizedata(self):
-        pass
-
-    def __splitdata(self):
-        pass
