@@ -69,7 +69,7 @@ class classifier(preparedata):
     def __model(self):
         num_classes = 5
 
-        model = tf.keras.Sequential(
+        self.model = tf.keras.Sequential(
             [
                 tf.keras.layers.Conv2D(
                     32, 3, activation="relu", input_shape=(28, 28, 3)
@@ -85,15 +85,14 @@ class classifier(preparedata):
             ]
         )
 
-        model.compile(
+        self.model.compile(
             optimizer="adam",
-            loss=tf.losses.SparseCategoricalCrossentropy(from_logits=True),
+            loss="categorical_crossentropy",
             metrics=["accuracy"],
         )
-        return model
 
     def __train(self):
-        self.__model.fit(self.train_ds, validation_data=self.val_ds, epochs=3)
+        self.model.fit_generator(self.train_ds, validation_data=self.val_ds, epochs=3)
 
-    def predict(self, img):
-        return self.__model.predict(img)
+    def trained_model(self):
+        return self.__train()
