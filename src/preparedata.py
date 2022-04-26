@@ -16,7 +16,9 @@ class preparedata:
 
     def __loaddata(self):
 
-        datagen = tf.keras.preprocessing.image.ImageDataGenerator(rescale=1.0 / 255)
+        datagen = tf.keras.preprocessing.image.ImageDataGenerator(
+            rescale=1.0 / 255, validation_split=0.2
+        )
 
         self.train_ds = datagen.flow_from_directory(
             self.path,
@@ -24,7 +26,6 @@ class preparedata:
             color_mode="rgb",
             batch_size=self.batch_size,
             subset="training",
-            alidation_split=0.2,
             seed=123,
         )
 
@@ -34,7 +35,6 @@ class preparedata:
             color_mode="rgb",
             batch_size=self.batch_size,
             subset="validation",
-            alidation_split=0.2,
             seed=123,
         )
 
