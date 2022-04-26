@@ -72,7 +72,10 @@ class classifier(preparedata):
         self.model = tf.keras.Sequential(
             [
                 tf.keras.layers.Conv2D(
-                    32, 3, activation="relu", input_shape=(28, 28, 3)
+                    32,
+                    3,
+                    activation="relu",
+                    input_shape=(self.img_height, self.img_width, 3),
                 ),
                 tf.keras.layers.MaxPooling2D(),
                 tf.keras.layers.Conv2D(32, 3, activation="relu"),
