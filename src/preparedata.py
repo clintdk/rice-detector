@@ -13,8 +13,6 @@ class preparedata:
         self.path = path
         self.__loaddata()
         self.__normalizedata()
-        self.__resizedata()
-        self.__splitdata()
 
     def __loaddata(self):
         self.train_ds = tf.keras.utils.image_dataset_from_directory(
@@ -37,3 +35,40 @@ class preparedata:
     def __normalizedata(self):
         self.train_ds = self.train_ds / 255.0
         self.val_ds = self.val_ds / 255.0
+
+
+class classifier(preparedata):
+    def __init__(self, path: str, img_height, img_width, batch_size=32):
+        super().__init__(path, img_height, img_width, batch_size)
+        self.__model()
+        self.__train()
+
+    def __model(self):
+        num_classes = 5
+
+        model = tf.keras.Sequential(
+            [
+                tf.keras.layers.Conv2D(32, 3, activation="relu"),
+                tf.keras.layers.MaxPooling2D(),
+                tf.keras.layers.Conv2D(32, 3, activation="relu"),
+                tf.keras.layers.MaxPooling2D(),
+                tf.keras.layers.Conv2D(32, 3, activation="relu"),
+                tf.keras.layers.MaxPooling2D(),
+                tf.keras.layers.Flatten(),
+                tf.keras.layers.Dense(128, activation="relu"),
+                tf.keras.layers.Dense(num_classes),
+            ]
+        )
+
+        model.compile(
+            optimizer="adam",
+            loss=tf.losses.SparseCategoricalCrossentropy(from_logits=True),
+            metrics=["accuracy"],
+        )
+        return model
+
+    def __train(self):
+        self.__model.fit(self.train_ds, validation_data=self.val_ds, epochs=3)
+
+    def predict(self, img):
+        return self.__model.predict(img)
