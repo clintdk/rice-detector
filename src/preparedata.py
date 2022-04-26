@@ -6,39 +6,62 @@ import tensorflow as tf
 
 
 class preparedata:
-    def __init__(self, path: str, img_height, img_width, batch_size=32):
+    def __init__(self, path: str, img_height=28, img_width=28, batch_size=32):
         self.img_height = img_height
         self.img_width = img_width
         self.batch_size = batch_size
         self.path = path
         self.__loaddata()
-        self.__normalizedata()
+        # self.__normalizedata()
 
     def __loaddata(self):
-        self.train_ds = tf.keras.utils.image_dataset_from_directory(
+
+        datagen = tf.keras.preprocessing.image.ImageDataGenerator(rescale=1.0 / 255)
+
+        self.train_ds = datagen.flow_from_directory(
             self.path,
-            validation_split=0.2,
-            subset="training",
-            seed=123,
-            image_size=(self.img_height, self.img_width),
+            target_size=(self.img_width, self.img_height),
+            color_mode="rgb",
             batch_size=self.batch_size,
-        )
-        self.val_ds = tf.keras.utils.image_dataset_from_directory(
-            self.path,
-            validation_split=0.2,
             subset="training",
+            alidation_split=0.2,
             seed=123,
-            image_size=(self.img_height, self.img_width),
-            batch_size=self.batch_size,
         )
 
-    def __normalizedata(self):
-        self.train_ds = self.train_ds / 255.0
-        self.val_ds = self.val_ds / 255.0
+        self.val_ds = datagen.flow_from_directory(
+            self.path,
+            target_size=(self.img_width, self.img_height),
+            color_mode="rgb",
+            batch_size=self.batch_size,
+            subset="validation",
+            alidation_split=0.2,
+            seed=123,
+        )
+
+        # self.train_ds = tf.keras.preprocessing.image_dataset_from_directory(
+        #     self.path,
+        #     validation_split=0.2,
+        #     subset="training",
+        #     seed=123,
+        #     image_size=(self.img_height, self.img_width),
+        #     batch_size=self.batch_size,
+        # )
+        # self.val_ds = tf.keras.preprocessing.image_dataset_from_directory(
+        #     self.path,
+        #     validation_split=0.2,
+        #     subset="training",
+        #     seed=123,
+        #     image_size=(self.img_height, self.img_width),
+        #     batch_size=self.batch_size,
+        # )
+
+    # def __normalizedata(self):
+    #     self.train_ds = self.train_ds / 255.0
+    #     self.val_ds = self.val_ds / 255.0
 
 
 class classifier(preparedata):
-    def __init__(self, path: str, img_height, img_width, batch_size=32):
+    def __init__(self, path: str, img_height=28, img_width=28, batch_size=32):
         super().__init__(path, img_height, img_width, batch_size)
         self.__model()
         self.__train()
@@ -48,7 +71,9 @@ class classifier(preparedata):
 
         model = tf.keras.Sequential(
             [
-                tf.keras.layers.Conv2D(32, 3, activation="relu"),
+                tf.keras.layers.Conv2D(
+                    32, 3, activation="relu", input_shape=(28, 28, 3)
+                ),
                 tf.keras.layers.MaxPooling2D(),
                 tf.keras.layers.Conv2D(32, 3, activation="relu"),
                 tf.keras.layers.MaxPooling2D(),
