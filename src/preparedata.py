@@ -38,27 +38,6 @@ class preparedata:
             seed=123,
         )
 
-        # self.train_ds = tf.keras.preprocessing.image_dataset_from_directory(
-        #     self.path,
-        #     validation_split=0.2,
-        #     subset="training",
-        #     seed=123,
-        #     image_size=(self.img_height, self.img_width),
-        #     batch_size=self.batch_size,
-        # )
-        # self.val_ds = tf.keras.preprocessing.image_dataset_from_directory(
-        #     self.path,
-        #     validation_split=0.2,
-        #     subset="training",
-        #     seed=123,
-        #     image_size=(self.img_height, self.img_width),
-        #     batch_size=self.batch_size,
-        # )
-
-    # def __normalizedata(self):
-    #     self.train_ds = self.train_ds / 255.0
-    #     self.val_ds = self.val_ds / 255.0
-
 
 class classifier(preparedata):
     def __init__(self, path: str, img_height=28, img_width=28, batch_size=32):
@@ -111,7 +90,12 @@ class classifier(preparedata):
         )
 
     def __train(self):
-        self.model.fit_generator(self.train_ds, validation_data=self.val_ds, epochs=20)
+        self.history = self.model.fit_generator(
+            self.train_ds, validation_data=self.val_ds, epochs=1
+        )
 
     def trained_model(self):
-        return self.__train()
+        return self.history
+
+    def save_model(self, savedir: str):
+        self.history.save(savedir, save_format="tf")
