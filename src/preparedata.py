@@ -73,18 +73,34 @@ class classifier(preparedata):
             [
                 tf.keras.layers.Conv2D(
                     32,
-                    3,
+                    (3, 3),
                     activation="relu",
                     input_shape=(self.img_height, self.img_width, 3),
                 ),
-                tf.keras.layers.MaxPooling2D(),
-                tf.keras.layers.Conv2D(32, 3, activation="relu"),
-                tf.keras.layers.MaxPooling2D(),
-                tf.keras.layers.Conv2D(32, 3, activation="relu"),
-                tf.keras.layers.MaxPooling2D(),
+                tf.keras.layers.BatchNormalization(),
+                tf.keras.layers.Conv2D(32, (3, 3), activation="relu", padding="same"),
+                tf.keras.layers.BatchNormalization(axis=3),
+                tf.keras.layers.MaxPooling2D(pool_size=(2, 2), padding="same"),
+                tf.keras.layers.Dropout(0.3),
+                tf.keras.layers.Conv2D(64, (3, 3), activation="relu", padding="same"),
+                tf.keras.layers.BatchNormalization(),
+                tf.keras.layers.Conv2D(64, (3, 3), activation="relu", padding="same"),
+                tf.keras.layers.BatchNormalization(axis=3),
+                tf.keras.layers.MaxPooling2D(pool_size=(2, 2), padding="same"),
+                tf.keras.layers.Dropout(0.3),
+                tf.keras.layers.Conv2D(128, (3, 3), activation="relu", padding="same"),
+                tf.keras.layers.BatchNormalization(),
+                tf.keras.layers.Conv2D(128, (3, 3), activation="relu", padding="same"),
+                tf.keras.layers.BatchNormalization(axis=3),
+                tf.keras.layers.MaxPooling2D(pool_size=(2, 2), padding="same"),
+                tf.keras.layers.Dropout(0.5),
                 tf.keras.layers.Flatten(),
+                tf.keras.layers.Dense(512, activation="relu"),
+                tf.keras.layers.BatchNormalization(),
+                tf.keras.layers.Dropout(0.5),
                 tf.keras.layers.Dense(128, activation="relu"),
-                tf.keras.layers.Dense(num_classes),
+                tf.keras.layers.Dropout(0.25),
+                tf.keras.layers.Dense(num_classes, activation="softmax"),
             ]
         )
 
@@ -95,7 +111,7 @@ class classifier(preparedata):
         )
 
     def __train(self):
-        self.model.fit_generator(self.train_ds, validation_data=self.val_ds, epochs=3)
+        self.model.fit_generator(self.train_ds, validation_data=self.val_ds, epochs=20)
 
     def trained_model(self):
         return self.__train()
